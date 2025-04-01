@@ -1,0 +1,66 @@
+body {
+     margin: 0;
+    font-family: Arial, sans-serif;
+}
+.top_bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    height: 60px; /* Set a fixed height for the top bar */
+}
+.logo {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center; /* Centers the logo horizontally */
+    align-items: center;     /* Centers the logo vertically */
+}
+/*TODO: The logo is slightly aligned to the left; fix it later*/
+.logo img {
+    justify-self: center;
+    width: auto;
+    object-fit: contain
+}
+.links {
+    display: flex;
+    gap: 20px;
+}
+.links a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    margin-left: auto;
+}
+.links a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    display: flex;
+    height: calc(100vh - 60px); /* Full height minus top bar height */
+}
+
+.left {
+    width: 250px; /* Initial width */
+    background-color: #f4f4f4;
+    border-right: 2px solid #ccc;
+    resize: horizontal; /* Allow resizing horizontally */
+    overflow: auto; /* Ensure content is scrollable if needed */
+    min-width: 150px; /* Set a minimum width */
+}
+.center {
+    flex-grow: 1; /* Takes up the remaining space */
+    background-color: #fff;
+    padding: 20px;
+    overflow: auto; /* Ensure content is scrollable if needed */
+}
+.right {
+    width: 250px; /* Initial width */
+    background-color: #f4f4f4;
+    border-left: 2px solid #ccc;
+    resize: horizontal; /* Allow resizing horizontally */
+    overflow: auto; /* Ensure content is scrollable if needed */
+    min-width: 150px; /* Set a minimum width */
+}
