@@ -7,7 +7,8 @@ document.getElementById('fileInput').addEventListener('change', function(event) 
             alert('You can only upload files with .elf extension!');
             event.target.value = ''; // Resetta il campo file
         } else {
-            window.location.href = 'https://github.com/aconsonni19/Binoculars'; //REINDIRIZZAMENTO PAGINA DI CONSO
+            window.location.href = 'https://github.com/aconsonni19/Binoculars'; //REINDIRIZZAMENTO PAGINA DI CONSO (FLASK)
+            event.target.value = '';
         }
     }
 });
