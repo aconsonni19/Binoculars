@@ -9,13 +9,13 @@ body {
     padding: 10px 20px;
     background-color: #333;
     color: white;
-    height: 60px; /* Set a fixed height for the top bar */
+    height: 60px;
 }
 .logo {
     flex-grow: 1;
     display: flex;
-    justify-content: center; /* Centers the logo horizontally */
-    align-items: center;     /* Centers the logo vertically */
+    justify-content: center;
+    align-items: center;
 }
 /*TODO: The logo is slightly aligned to the left; fix it later*/
 .logo img {
@@ -39,28 +39,31 @@ body {
 
 .container {
     display: flex;
+    justify-content: center;
     height: calc(100vh - 60px); /* Full height minus top bar height */
 }
 
 .left {
-    width: 250px; /* Initial width */
+    width: 250px;
     background-color: #f4f4f4;
+    text-align: center;
     border-right: 2px solid #ccc;
-    resize: horizontal; /* Allow resizing horizontally */
-    overflow: auto; /* Ensure content is scrollable if needed */
-    min-width: 150px; /* Set a minimum width */
+    resize: horizontal;
+    overflow: auto; 
+    min-width: 150px; 
 }
 .center {
-    flex-grow: 1; /* Takes up the remaining space */
+    flex-grow: 1;
+    text-align: center;
     background-color: #fff;
-    padding: 20px;
-    overflow: auto; /* Ensure content is scrollable if needed */
+    overflow: auto;
 }
 .right {
-    width: 250px; /* Initial width */
+    width: 250px;
     background-color: #f4f4f4;
     border-left: 2px solid #ccc;
-    resize: horizontal; /* Allow resizing horizontally */
-    overflow: auto; /* Ensure content is scrollable if needed */
-    min-width: 150px; /* Set a minimum width */
+    resize: horizontal;
+    overflow: auto;
+    min-width: 150px;
+    direction: rtl;
 }
