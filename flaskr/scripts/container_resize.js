@@ -19,7 +19,7 @@ function initResizable(resizer, targetPane, isLeft) {
                 newWidth = startWidth -dx;
             }
 
-            // Constrains the panel to a minimum width
+            // Constrains the center panel to a minimum width
             if (newWidth > 100 && newWidth < window.innerWidth - 100) {
                 targetPane.style.width = `${newWidth}px`;
             }
