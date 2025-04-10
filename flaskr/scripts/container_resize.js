@@ -47,3 +47,13 @@ window.addEventListener("DOMContentLoaded", () => {
     initResizable(resizerLeft, left, true);
     initResizable(resizerRight, right, false);
 });
+
+//Funzione per il pulsante ABOUT
+document.getElementById('aboutButton').addEventListener('click', function() {
+    window.location.href = '#about'; //DA SISTEMARE (FLASK)
+});
+
+//Funzione per il pulsante GITHUB
+document.getElementById('githubButton').addEventListener('click', function() {
+    window.location.href = 'https://github.com/aconsonni19/Binoculars';
+});
