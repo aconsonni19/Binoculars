@@ -44,27 +44,36 @@ body {
 }
 
 .left {
-    width: 200px;
+    width: 25%;
     background-color: #f4f4f4;
     text-align: center;
-    border-right: 2px solid #ccc;
     resize: horizontal;
     overflow: auto; 
     min-width: 150px; 
 }
 .center {
-    width: 2;
     flex-grow: 1;
     text-align: center;
     background-color: #fff;
     overflow: auto;
 }
 .right {
-    width: 100px;
+    width: 25%;
     background-color: #f4f4f4;
-    border-left: 2px solid #ccc;
     resize: horizontal;
     overflow: auto;
     min-width: 150px;
     direction: rtl;
+}
+
+.resizer {
+    background-color: #444857;
+    cursor: col-resize;
+    height: 100%;
+    width: 5px;
+    flex-shrink: 0;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+    user-select: none;
 }
