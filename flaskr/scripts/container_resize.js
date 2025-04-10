@@ -15,11 +15,11 @@ function initResizable(resizer, targetPane, isLeft) {
                 // Left pane: grows/shrinks by moving the resizer to the right
                 newWidth = startWidth + dx;
             } else {
-                // Right pane: grows if you drag to the left (expand right panel), shrinks if you drag right
-                newWidth = startWidth -dx;  // The negative sign makes it grow when moving left and shrink when moving right
+                // Right pane: grows if you drag to the left shrinks if you drag right
+                newWidth = startWidth -dx;
             }
 
-            // Optional: prevent the panel from becoming too small or too large
+            // Constrains the panel to a minimum width
             if (newWidth > 100 && newWidth < window.innerWidth - 100) {
                 targetPane.style.width = `${newWidth}px`;
             }
@@ -44,6 +44,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const resizerLeft = document.getElementById("resizer-left");
     const resizerRight = document.getElementById("resizer-right");
 
-    initResizable(resizerLeft, left, true);  // Left pane resizing logic
-    initResizable(resizerRight, right, false);  // Right pane resizing logic
+    initResizable(resizerLeft, left, true);
+    initResizable(resizerRight, right, false);
 });
