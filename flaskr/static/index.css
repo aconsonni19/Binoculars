@@ -36,9 +36,7 @@ body {
     transition: background-color 0.3s ease;
 }
 #uploadButton {
-    /*background-color: #555555;*/
     background-color: #ffa420;
-    /*color: #ffffff;*/
     color: #2c2c2c;
     border: none;
     padding: 15px 25px;
@@ -56,16 +54,15 @@ body {
     text-align: center;
     padding: 20px;
 }
-.content h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
-}
 .content p {
-    font-size: 18px;
+    font-size: 20px;
     margin-bottom: 20px;
 }
-.content button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
+#about {
+    color: #ffffff;
+    font-size: 17px;
+    margin: 0;
+    padding-left: 50px;
+    padding-right: 50px;
+    text-align: justify;
 }
