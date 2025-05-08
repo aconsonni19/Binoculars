@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect
 
+# TODO: Ha bisogno di un serio e profondo refactoring del codice
+
 app = Flask(__name__)
 
 magic_bytes = b"\x7fELF"
@@ -23,5 +25,5 @@ def main():
 def code_analysis():
 
 
-    
+
     return render_template("code_analysis.html")
