@@ -24,8 +24,10 @@
             </div>
             <p>Upload your binary file to discover the vulnerabilities!</p>
             <br>
-            <button id="uploadButton">Upload</button>
-            <input type="file" id="fileInput" style="display: none;">
+            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+                <button type="button" id="uploadButton">Upload</button>
+                <input type="file" id="fileInput" name="file" accept=".elf" style="display: none;">
+            </form> 
             <br><br><br><br><br><br><br><br><br><br><br>
             <div class="footer">
                 <p id="about">
@@ -88,7 +90,6 @@
                 </p>
             </div>
         </div>
-        
-        <script src="../scripts/index.js"></script>
+        <script src="../static/scripts/index.js"></script>
     </body>
 </html>
