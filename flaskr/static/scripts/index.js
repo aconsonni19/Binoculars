@@ -1,8 +1,9 @@
-
+// Upload button listener
 document.getElementById("uploadButton").addEventListener("click", () => {
     document.getElementById("fileInput").click();  // Open file picker
 });
 
+// Function that handles the submission of the form where the file is uploaded
 document.getElementById("fileInput").addEventListener("change", () => {
     // Check if a file is selected
     if (document.getElementById("fileInput").files.length > 0) {
@@ -20,4 +21,12 @@ document.getElementById('aboutButton').addEventListener('click', function() {
 //Funzione per il pulsante GITHUB
 document.getElementById('githubButton').addEventListener('click', function() {
     window.location.href = 'https://github.com/aconsonni19/Binoculars';
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    var errorMessage = document.getElementById("error-message").getAttribute("data-error");
+
+    if (errorMessage) {
+        alert(errorMessage);
+    }
 });
