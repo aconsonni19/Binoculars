@@ -1,3 +1,7 @@
+// TODO: Anche questo file ha bisogno di un serio refactoring del codice sorgente;
+// Dovremmo pensare seriamente di utilizzare un framework web a questo punto
+
+
 // Upload button listener
 document.getElementById("uploadButton").addEventListener("click", () => {
     document.getElementById("fileInput").click();  // Open file picker
