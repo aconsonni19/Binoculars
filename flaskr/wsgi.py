@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session
 from werkzeug.utils import secure_filename
 from pwn import *
+from elftools.elf.elffile import ELFFile
 from capstone import *
 import os
 
