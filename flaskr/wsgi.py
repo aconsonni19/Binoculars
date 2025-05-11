@@ -45,6 +45,34 @@ def main():
 
 
 
+#@app.route("/analysis")
+#def code_analysis():
+#    filepath = session.get("FILEPATH")
+    
+#    if not filepath or not os.path.exists(filepath):
+#        abort(404, description="File not found")
+    
+#    try:
+#        with open(filepath, 'rb') as file:
+#            arch = file.read(1)
+#            endianness = file.read(1)
+#            md = Cs(CS_ARCH_X86, CS_MODE_32 if arch == b"\x01" else CS_MODE_64)
+#            md.detail = True if endianness == b"\x01" else False
+#            file.seek(0)
+#            file_contents = file.read()
+#            for i in md.disasm(file_contents, 0x1000):
+#                print("0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str))
+
+#    except Exception as e:
+#        return str(e)
+
+
+
+
+
+#    return render_template("code_analysis.html")
+
+
 @app.route("/analysis")
 def code_analysis():
     filepath = session.get("FILEPATH")
@@ -54,21 +82,24 @@ def code_analysis():
     
     try:
         with open(filepath, 'rb') as file:
-            arch = file.read(1)
-            endianness = file.read(1)
-            md = Cs(CS_ARCH_X86, CS_MODE_32 if arch == b"\x01" else CS_MODE_64)
-            md.detail = True if endianness == b"\x01" else False
-            file.seek(0)
-            file_contents = file.read()
-            for i in md.disasm(file_contents, 0x1000):
-                print("0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str))
+            # Parsing del file ELF con pyelftools
+            elf = ELFFile(file)
+            text_section = elf.get_section_by_name('.text')  # Sezione del codice
+            if not text_section:
+                return "No .text section found in the ELF file."
+
+            code = text_section.data()  # Ottieni i byte della sezione .text
+            addr = text_section['sh_addr']  # Indirizzo di partenza della sezione
+
+            # Disassembly con Capstone
+            md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
+            disassembly = []
+            for i in md.disasm(code, addr):
+                disassembly.append(f"0x{i.address:x}:\t{i.mnemonic}\t{i.op_str}")
+
+            # Mostra il risultato del disassembly
+            return render_template("code_analysis.html", disassembly="\n".join(disassembly))
 
     except Exception as e:
         return str(e)
-
-
-
-
-
-    return render_template("code_analysis.html")
     
