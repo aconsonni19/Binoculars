@@ -88,17 +88,19 @@ def code_analysis():
             if not text_section:
                 return "No .text section found in the ELF file."
 
-            code = text_section.data()  # Ottieni i byte della sezione .text
-            addr = text_section['sh_addr']  # Indirizzo di partenza della sezione
-
             # Disassembly con Capstone
             md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
             disassembly = []
-            for i in md.disasm(code, addr):
-                disassembly.append(f"0x{i.address:x}:\t{i.mnemonic}\t{i.op_str}")
-
+            for section in elf.iter_sections():
+                code = section.data()
+                print(section.name)
+                addr = section['sh_addr']
+                for i in md.disasm(code, addr):
+                    # Save address, instruction and registers/memory section involved 
+                    # as a tuple so that the it can be formatted and styled indipendently:
+                    disassembly.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
             # Mostra il risultato del disassembly
-            return render_template("code_analysis.html", disassembly="\n".join(disassembly))
+            return render_template("code_analysis.html", disassembly=disassembly)
 
     except Exception as e:
         return str(e)
