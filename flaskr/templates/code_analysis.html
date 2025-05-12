@@ -36,7 +36,7 @@
                         {% for instruction in section[1:] %}
                         <tr>
                             <td>{{ instruction[0] }}</td>
-                            <td>{{ instruction[1] }}</td>
+                            <td class="mnemonic mnemonic-{{ instruction[1] }}">{{ instruction[1] }}</td>
                             <td>{{ instruction[2] }}</td>
                         </tr>
                         {% endfor %}

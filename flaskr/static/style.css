@@ -124,3 +124,45 @@ th, td {
     font-weight: bold;
     text-align: center;
 }
+
+/*Data movement instructions */
+.mnemonic-mov, .mnemonic-push, .mnemonic-pop, .mnemonic-lea {
+    color: #ff9800;
+}
+
+/*Arithmetic & Logical operations */
+.mnemonic-add, .mnemonic-sub, .mnemonic-mul, .mnemonic-div, 
+.mnemonic-and, .mnemonic-or, .mnemonic-xor, .mnemonic-not {
+    color: #4caf50;
+}
+
+/*Control flow instructions */
+.mnemonic-jmp, .mnemonic-call, .mnemonic-ret {
+    color: #d32f2f;
+}
+
+.mnemonic-je, .mnemonic-jne, .mnemonic-jg, .mnemonic-jl,
+.mnemonic-jge, .mnemonic-jle, .mnemonic-jo, .mnemonic-jno {
+    color: #f44336;;
+}
+
+/*Comparison & test instructions */
+.mnemonic-cmp, .mnemonic-test {
+    color: #9c27b0;
+}
+
+/*Bitwise shift/rotate instructions */
+.mnemonic-shl, .mnemonic-shr, .mnemonic-sal, .mnemonic-sar, 
+.mnemonic-rol, .mnemonic-ror {
+    color: #ff5722;
+}
+
+/*Floating point operations */
+.mnemonic-fadd, .mnemonic-fsub, .mnemonic-fmul, .mnemonic-fdiv {
+    color: #00bcd4;
+}
+
+/* Special instructions */
+.mnemonic-nop, .mnemonic-hlt, .mnemonic-int {
+    color: #607d8b;
+}
