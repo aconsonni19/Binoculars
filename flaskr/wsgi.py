@@ -43,35 +43,6 @@ def main():
     return render_template("index.html")
 
 
-
-#@app.route("/analysis")
-#def code_analysis():
-#    filepath = session.get("FILEPATH")
-    
-#    if not filepath or not os.path.exists(filepath):
-#        abort(404, description="File not found")
-    
-#    try:
-#        with open(filepath, 'rb') as file:
-#            arch = file.read(1)
-#            endianness = file.read(1)
-#            md = Cs(CS_ARCH_X86, CS_MODE_32 if arch == b"\x01" else CS_MODE_64)
-#            md.detail = True if endianness == b"\x01" else False
-#            file.seek(0)
-#            file_contents = file.read()
-#            for i in md.disasm(file_contents, 0x1000):
-#                print("0x%x:\t%s\t%s" %(i.address, i.mnemonic, i.op_str))
-
-#    except Exception as e:
-#        return str(e)
-
-
-
-
-
-#    return render_template("code_analysis.html")
-
-
 @app.route("/analysis")
 def code_analysis():
     filepath = session.get("FILEPATH")
