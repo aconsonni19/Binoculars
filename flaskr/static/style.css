@@ -109,3 +109,18 @@ body {
 .resizer.active {
     background-color: #ffa420;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+.section-header {
+    background-color: gray; /* Light gray background */
+    font-weight: bold;
+    text-align: center;
+}

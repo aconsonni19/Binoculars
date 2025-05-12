@@ -62,13 +62,14 @@ def code_analysis():
             md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
             disassembly = []
             for section in elf.iter_sections():
+                disassembly_section = [section.name] # Dissasembly for this section with the section name at the head
                 code = section.data()
-                print(section.name)
                 addr = section['sh_addr']
                 for i in md.disasm(code, addr):
                     # Save address, instruction and registers/memory section involved 
                     # as a tuple so that the it can be formatted and styled indipendently:
-                    disassembly.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
+                    disassembly_section.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
+                disassembly.append(disassembly_section)
             # Mostra il risultato del disassembly
             return render_template("code_analysis.html", disassembly=disassembly)
 
