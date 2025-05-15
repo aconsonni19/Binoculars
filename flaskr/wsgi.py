@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify
 from werkzeug.utils import secure_filename
 from elftools.elf.elffile import ELFFile
 from capstone import *
 import os
+import tempfile
+from ghidra.app.decompiler import DecompInterface
+from ghidra.util.task import ConsoleTaskMonitor
 
 # TODO: Ha bisogno di un serio e profondo refactoring del codice
 
