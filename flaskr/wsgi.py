@@ -42,18 +42,8 @@ def code_analysis():
     if not filepath or not os.path.exists(filepath):
         abort(404, description="File not found")
     
-    try:
-        with open(filepath, 'rb') as file:
-            # Parsing del file ELF con pyelftools
-            elf = ELFFile(file)
+    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = decompile(filepath))    
 
-            decompile(filepath)
-            
-            # Mostra il risultato del disassembly
-            return render_template("code_analysis.html", disassembly=disassemble(filepath))
-
-    except Exception as e:
-        return str(e)
 
 # TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
 def valid_file(file):
@@ -97,14 +87,17 @@ def disassemble(filepath):
         return str(e)
 
 def decompile(filepath):
-    decompiled_functions = []
-    with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
-        program = flat_api.getCurrentProgram() # Get the program being analyzed
-        listing = program.getListing() # Get the program listing of the symbols
-        decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
-        for name in listing.getFunctions(True):
-            decompiled_functions.append(decompiler.decompile(name)) # Decompile the function
-    return decompiled_functions
+    try:
+        decompiled_functions = []
+        with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
+            program = flat_api.getCurrentProgram() # Get the program being analyzed
+            listing = program.getListing() # Get the program listing of the symbols
+            decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
+            for name in listing.getFunctions(True):
+                decompiled_functions.append(decompiler.decompile(name)) # Decompile the function
+        return decompiled_functions
+    except Exception as e:
+        return str(e)
 
 
 
