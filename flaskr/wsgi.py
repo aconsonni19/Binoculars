@@ -15,24 +15,6 @@ TEMP_UPLOAD_FOLDER = "./tmp/"
 app.config['TEMP_UPLOAD_FOLDER'] = TEMP_UPLOAD_FOLDER
 app.secret_key = os.urandom(256)
 
-
-
-# TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
-def valid_file(file):
-    magic_bytes = b"\x7fELF" # Magic bytes at the start of every 
-    return ".elf" in file.filename or file.read(4) == magic_bytes
-
-
-def save_file(file):
-    filename = secure_filename(file.filename)
-    os.makedirs(app.config['TEMP_UPLOAD_FOLDER'], exist_ok=True)
-    filepath = os.path.join(app.config["TEMP_UPLOAD_FOLDER"], filename)
-    session["FILEPATH"] = filepath
-    file.save(filepath)
-
-def file_cleanup(file):
-    return null # TODO
-
 @app.route("/", methods = ["GET", "POST"])
 def main():
     if request.method == "POST":
@@ -57,6 +39,34 @@ def code_analysis():
         with open(filepath, 'rb') as file:
             # Parsing del file ELF con pyelftools
             elf = ELFFile(file)
+            
+            # Mostra il risultato del disassembly
+            return render_template("code_analysis.html", disassembly=disassemble(filepath))
+
+    except Exception as e:
+        return str(e)
+
+# TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
+def valid_file(file):
+    magic_bytes = b"\x7fELF" # Magic bytes at the start of every 
+    return ".elf" in file.filename or file.read(4) == magic_bytes
+
+
+def save_file(file):
+    filename = secure_filename(file.filename)
+    os.makedirs(app.config['TEMP_UPLOAD_FOLDER'], exist_ok=True)
+    filepath = os.path.join(app.config["TEMP_UPLOAD_FOLDER"], filename)
+    session["FILEPATH"] = filepath
+    file.save(filepath)
+
+def file_cleanup(file):
+    return null # TODO
+
+
+def disassemble(filepath):
+    try:
+        with open(filepath, "rb") as file:
+            elf = ELFFile(file)
             text_section = elf.get_section_by_name('.text')  # Sezione del codice
             if not text_section:
                 return "No .text section found in the ELF file."
@@ -73,9 +83,7 @@ def code_analysis():
                     # as a tuple so that the it can be formatted and styled indipendently:
                     disassembly_section.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
                 disassembly.append(disassembly_section)
-            # Mostra il risultato del disassembly
-            return render_template("code_analysis.html", disassembly=disassembly)
-
+            return disassembly
     except Exception as e:
         return str(e)
     
