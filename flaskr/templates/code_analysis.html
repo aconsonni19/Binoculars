@@ -44,13 +44,28 @@
                 </table>
             </div>
             <div class="resizer" id = "resizer-left"></div>
-            <div class="center">
+            <!--<div class="center">
                 <h3>Decompiled Code</h3>
                 <pre class="">
                     <code class="code-block">
                         {{ decompiled | safe }}
                     </code>
                 </pre>
+            </div>-->
+            <div class="center">
+                <h3>Decompiled Code</h3>
+                <table>
+                    <tr>
+                        <th>Line</th>
+                        <th>Code</th>
+                    </tr>
+                    {% for line in decompiled.splitlines() %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td class="code-line">{{ line }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
             </div>
             <div class="resizer" id = "resizer-right"></div>
             <div class="right">

@@ -86,7 +86,7 @@ body {
 }
 .center {
     flex-grow: 1;
-    text-align: left;
+    text-align: center;
     overflow: auto;
 }
 
@@ -96,6 +96,36 @@ body {
     border-radius: 5px;
     overflow: auto;
     white-space: pre-wrap;
+    text-align: left;
+}
+/* Stile per le righe del codice decompilato */
+.code-line {
+    /*font-family: "Courier New", monospace; /* Font monospaziato per mantenere l'indentazione */
+    white-space: pre; /* Rispetta spazi e tabulazioni */
+    text-align: left; /* Allinea il testo a sinistra */
+    padding-left: 10px; /* Aggiunge un piccolo margine a sinistra */
+}
+
+/* Stile per la tabella del codice decompilato */
+.center table {
+    width: 100%;
+    border-collapse: collapse;  
+    margin: 0 auto;
+}
+
+.center th, .center td {
+    padding: 8px;
+    border: 1px solid black;
+    color: #dcdcdc;
+    /*font-family: "Courier New", monospace; /* Font simile a quello del codice */
+}
+
+.center th {
+    background-color: #333333;
+    color: #ffffff;
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .line-number {
