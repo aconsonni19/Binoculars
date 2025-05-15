@@ -119,15 +119,9 @@ def highlight_keywords(decompiled_code):
         r"\bWARNING\b": "keyword-warning",
         r"\bvoid\b": "keyword-void",
         r"\bstruct\b": "keyword-struct",
-        # Aggiungi altre parole chiave qui
     }
 
     for keyword, css_class in keywords.items():
-        #decompiled_code = decompiled_code.replace(
-        #    keyword, f'<span class="{css_class}">{keyword}</span>'
-        #decompiled_code = re.sub(
-        #    keyword, f'<span class="{css_class}">{keyword}</span>', decompiled_code
-        #)
         decompiled_code = re.sub(
             keyword,
             rf'<span class="{css_class}">\g<0></span>',

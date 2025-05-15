@@ -101,9 +101,9 @@ body {
 /* Stile per le righe del codice decompilato */
 .code-line {
     /*font-family: "Courier New", monospace; /* Font monospaziato per mantenere l'indentazione */
-    white-space: pre; /* Rispetta spazi e tabulazioni */
-    text-align: left; /* Allinea il testo a sinistra */
-    padding-left: 10px; /* Aggiunge un piccolo margine a sinistra */
+    white-space: pre;
+    text-align: left;
+    padding-left: 10px;
 }
 
 /* Stile per la tabella del codice decompilato */
@@ -231,32 +231,32 @@ table th {
     color: #607d8b;
 }
 
-/* Parole chiave */
+/* Keywords */
 .keyword-int {
-    color: #4caf50; /* Verde */
+    color: #4caf50;
 }
 
 .keyword-return {
-    color: #d32f2f; /* Rosso */
+    color: #d32f2f;
 }
 
 .keyword-if, .keyword-else, .keyword-for, .keyword-while {
-    color: #ff9800; /* Arancione */
+    color: #ff9800;
 }
 
 .keyword-warning {
-    color: #ff5722; /* Arancione scuro */
+    color: #ff5722;
     font-weight: bold;
 }
 
 .keyword-void {
-    color: #9c27b0; /* Viola */
+    color: #9c27b0;
 }
 
 .keyword-struct {
-    color: #671af9; /* Viola scuro */
+    color: #671af9;
 }
 
 .keyword-function {
-    color: #00bcd4; /* Blu */
+    color: #00bcd4;
 }
