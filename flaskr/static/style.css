@@ -234,20 +234,29 @@ table th {
 /* Parole chiave */
 .keyword-int {
     color: #4caf50; /* Verde */
-    font-weight: bold;
 }
 
 .keyword-return {
     color: #d32f2f; /* Rosso */
-    font-weight: bold;
 }
 
 .keyword-if, .keyword-else, .keyword-for, .keyword-while {
     color: #ff9800; /* Arancione */
+}
+
+.keyword-warning {
+    color: #ff5722; /* Arancione scuro */
     font-weight: bold;
+}
+
+.keyword-void {
+    color: #9c27b0; /* Viola */
+}
+
+.keyword-struct {
+    color: #671af9; /* Viola scuro */
 }
 
 .keyword-function {
     color: #00bcd4; /* Blu */
-    font-style: italic;
 }

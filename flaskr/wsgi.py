@@ -110,6 +110,15 @@ def highlight_keywords(decompiled_code):
         r"\bfor\b": "keyword-for",
         r"\bwhile\b": "keyword-while",
         r"\bprintf\b": "keyword-function",
+        r"\bmain\b": "keyword-function",
+        r"\bvoid\b": "keyword-int",
+        r"\bchar\b": "keyword-int",
+        r"\bfloat\b": "keyword-int",
+        r"\bdouble\b": "keyword-int",
+        r"\bbyte\b": "keyword-int",
+        r"\bWARNING\b": "keyword-warning",
+        r"\bvoid\b": "keyword-void",
+        r"\bstruct\b": "keyword-struct",
         # Aggiungi altre parole chiave qui
     }
 
