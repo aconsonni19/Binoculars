@@ -80,8 +80,9 @@ body {
     width: 25%;
     text-align: center;
     resize: horizontal;
-    overflow: auto; 
+    overflow: auto;
     min-width: 150px;
+    padding-bottom: 13px;
 }
 .center {
     flex-grow: 1;
@@ -112,6 +113,8 @@ body {
 }
 
 table {
+    margin: 0;
+    padding: 0;
     width: 100%;
     border-collapse: collapse;
 }
@@ -121,9 +124,23 @@ th, td {
     text-align: center;
 }
 .section-header {
+    position: sticky;
     background-color: gray; /* Light gray background */
     font-weight: bold;
     text-align: center;
+    top: 30px; /* Posiziona la riga della sezione sotto i titoli */
+    z-index: 1;
+    border: 1px solid black;
+}
+table th {
+    position: sticky;
+    top: 0;
+    background-color: #333333;
+    color: #ffffff;
+    z-index: 2;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid black;
 }
 
 /*Data movement instructions */
