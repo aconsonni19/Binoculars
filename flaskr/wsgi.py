@@ -4,6 +4,7 @@ from elftools.elf.elffile import ELFFile
 from capstone import *
 import os
 import pyghidra
+import re
 
 # TODO: Ha bisogno di un serio e profondo refactoring del codice
 
@@ -42,7 +43,7 @@ def code_analysis():
     if not filepath or not os.path.exists(filepath):
         abort(404, description="File not found")
     
-    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = decompile(filepath))    
+    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath)))   
 
 
 # TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
@@ -99,3 +100,28 @@ def decompile(filepath):
         return "\n".join(decompiled_functions)  # Ensure proper spacing
     except Exception as e:
         return str(e)
+    
+def highlight_keywords(decompiled_code):
+    keywords = {
+        r"\bint\b": "keyword-int",
+        r"\breturn\b": "keyword-return",
+        r"\bif\b": "keyword-if",
+        r"\belse\b": "keyword-else",
+        r"\bfor\b": "keyword-for",
+        r"\bwhile\b": "keyword-while",
+        r"\bprintf\b": "keyword-function",
+        # Aggiungi altre parole chiave qui
+    }
+
+    for keyword, css_class in keywords.items():
+        #decompiled_code = decompiled_code.replace(
+        #    keyword, f'<span class="{css_class}">{keyword}</span>'
+        #decompiled_code = re.sub(
+        #    keyword, f'<span class="{css_class}">{keyword}</span>', decompiled_code
+        #)
+        decompiled_code = re.sub(
+            keyword,
+            rf'<span class="{css_class}">\g<0></span>',
+            decompiled_code
+        )
+    return decompiled_code

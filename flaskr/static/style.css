@@ -230,3 +230,24 @@ table th {
 .mnemonic-nop, .mnemonic-hlt, .mnemonic-int {
     color: #607d8b;
 }
+
+/* Parole chiave */
+.keyword-int {
+    color: #4caf50; /* Verde */
+    font-weight: bold;
+}
+
+.keyword-return {
+    color: #d32f2f; /* Rosso */
+    font-weight: bold;
+}
+
+.keyword-if, .keyword-else, .keyword-for, .keyword-while {
+    color: #ff9800; /* Arancione */
+    font-weight: bold;
+}
+
+.keyword-function {
+    color: #00bcd4; /* Blu */
+    font-style: italic;
+}

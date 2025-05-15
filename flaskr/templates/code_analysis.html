@@ -62,7 +62,7 @@
                     {% for line in decompiled.splitlines() %}
                     <tr>
                         <td>{{ loop.index }}</td>
-                        <td class="code-line">{{ line }}</td>
+                        <td class="code-line">{{ line | safe }}</td>
                     </tr>
                     {% endfor %}
                 </table>
