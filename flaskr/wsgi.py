@@ -79,3 +79,37 @@ def code_analysis():
     except Exception as e:
         return str(e)
     
+@app.route('/decompile', methods=['POST'])
+def decompile():
+    if 'file' not in request.files:
+        return jsonify({"error": "Nessun file caricato"}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "File non selezionato"}), 400
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        binary_path = os.path.join(tmp_dir, file.filename)
+        file.save(binary_path)
+
+        # Configura Ghidra via Pyhidra
+        from pyhidra.core import get_current_project
+        from pyhidra.launcher import HeadlessPyhidraLauncher
+
+        decompiled_code = ""
+        with HeadlessPyhidraLauncher() as launcher:
+            launcher.start()
+            program = launcher.load_program(binary_path)
+            decompiler = DecompInterface()
+            decompiler.openProgram(program)
+
+            # Decompila tutte le funzioni
+            for func in program.getFunctionManager().getFunctions(True):
+                results = decompiler.decompileFunction(func, 30, ConsoleTaskMonitor())
+                if results.decompileCompleted():
+                    decompiled_code += f"// Function: {func.getName()}\n"
+                    decompiled_code += results.getDecompiledFunction().getC() + "\n"
+
+        #return jsonify({"decompiled": decompiled_code})
+        print(decompiled_code)
+    
