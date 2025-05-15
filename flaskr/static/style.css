@@ -86,9 +86,25 @@ body {
 }
 .center {
     flex-grow: 1;
-    text-align: center;
+    text-align: left;
     overflow: auto;
 }
+
+.code-block {
+    color: #dcdcdc;
+    font-family: "Courier New", monospace;
+    border-radius: 5px;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.line-number {
+    display: inline-block;
+    width: 40px;
+    text-align: right;
+    color: #888888;
+}
+
 .right {
     width: 25%;
     resize: horizontal;

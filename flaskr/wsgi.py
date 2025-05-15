@@ -94,14 +94,8 @@ def decompile(filepath):
             listing = program.getListing() # Get the program listing of the symbols
             decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
             for name in listing.getFunctions(True):
-                decompiled_functions.append(decompiler.decompile(name)) # Decompile the function
-        return decompiled_functions
+                decompiled_code = decompiler.decompile(name)
+                decompiled_functions.append(decompiled_code) # Decompile the function
+        return "\n".join(decompiled_functions)  # Ensure proper spacing
     except Exception as e:
         return str(e)
-
-
-
-
-    
-
-
