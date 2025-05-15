@@ -378,3 +378,4 @@ pyrightconfig.json
 
 # Custom
 /flaskr/tmp
+/ghidra

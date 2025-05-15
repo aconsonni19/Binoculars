@@ -3,9 +3,7 @@ from werkzeug.utils import secure_filename
 from elftools.elf.elffile import ELFFile
 from capstone import *
 import os
-import tempfile
-from ghidra.app.decompiler import DecompInterface
-from ghidra.util.task import ConsoleTaskMonitor
+import pyghidra
 
 # TODO: Ha bisogno di un serio e profondo refactoring del codice
 
@@ -14,6 +12,15 @@ app = Flask(__name__)
 TEMP_UPLOAD_FOLDER = "./tmp/"
 app.config['TEMP_UPLOAD_FOLDER'] = TEMP_UPLOAD_FOLDER
 app.secret_key = os.urandom(256)
+
+# TODO: Move to a setup function, so that the imports can be done at the start of the program
+# Initialize jython enviorment with PyGhidra
+
+pyghidra.start(install_dir = "../ghidra/")
+from ghidra.app.decompiler import DecompInterface
+from ghidra.util.task import ConsoleTaskMonitor
+from ghidra.app.decompiler.flatapi import FlatDecompilerAPI
+
 
 @app.route("/", methods = ["GET", "POST"])
 def main():
@@ -39,6 +46,8 @@ def code_analysis():
         with open(filepath, 'rb') as file:
             # Parsing del file ELF con pyelftools
             elf = ELFFile(file)
+
+            decompile(filepath)
             
             # Mostra il risultato del disassembly
             return render_template("code_analysis.html", disassembly=disassemble(filepath))
@@ -86,38 +95,20 @@ def disassemble(filepath):
             return disassembly
     except Exception as e:
         return str(e)
+
+def decompile(filepath):
+    decompiled_functions = []
+    with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
+        program = flat_api.getCurrentProgram() # Get the program being analyzed
+        listing = program.getListing() # Get the program listing of the symbols
+        decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
+        for name in listing.getFunctions(True):
+            decompiled_functions.append(decompiler.decompile(name)) # Decompile the function
+    return decompiled_functions
+
+
+
+
     
-@app.route('/decompile', methods=['POST'])
-def decompile():
-    if 'file' not in request.files:
-        return jsonify({"error": "Nessun file caricato"}), 400
-    
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "File non selezionato"}), 400
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        binary_path = os.path.join(tmp_dir, file.filename)
-        file.save(binary_path)
 
-        # Configura Ghidra via Pyhidra
-        from pyhidra.core import get_current_project
-        from pyhidra.launcher import HeadlessPyhidraLauncher
-
-        decompiled_code = ""
-        with HeadlessPyhidraLauncher() as launcher:
-            launcher.start()
-            program = launcher.load_program(binary_path)
-            decompiler = DecompInterface()
-            decompiler.openProgram(program)
-
-            # Decompila tutte le funzioni
-            for func in program.getFunctionManager().getFunctions(True):
-                results = decompiler.decompileFunction(func, 30, ConsoleTaskMonitor())
-                if results.decompileCompleted():
-                    decompiled_code += f"// Function: {func.getName()}\n"
-                    decompiled_code += results.getDecompiledFunction().getC() + "\n"
-
-        #return jsonify({"decompiled": decompiled_code})
-        print(decompiled_code)
-    
