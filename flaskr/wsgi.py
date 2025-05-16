@@ -75,6 +75,8 @@ def disassemble(filepath):
             md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
             disassembly = []
             for section in elf.iter_sections():
+                if not section.name or not section.data():
+                    continue
                 disassembly_section = [section.name] # Dissasembly for this section with the section name at the head
                 code = section.data()
                 addr = section['sh_addr']
