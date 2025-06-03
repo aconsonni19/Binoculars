@@ -96,6 +96,69 @@ The execution of `SimProcedures` makes the analysis faster but more inaccurate.
 - When performing a simulation, at every step angr check if the current address has benn hooked, and if so, runs the hook instead of the binary code of the addres.
 
 # Symbolic Expressions and Constraint Solving
+- angr is able to execute programs with **symbolic variables**. Instead of saying that a variable has a concrete numerical value, we can say
+that it holds a **symbol**, which is just a name. Performing arithmetic operations with that variable will yield a **tree of operations** called an **Abstract Syntax Tree (AST)**.
+ASTs can be translated into **constrains** for an SMT solver.
 
+## Working with Bitvectors
+- A bitvector is just a sequence of bits, interpreted with the semantics of a **bounded integer** for arithmetic. We can perform mathematical operations on bitvectors.
+- It is a type error to perform an operation on bitvectors with different lengths. We can however extend one of the bitvectors so it has an approprieate number of bits with `.zero_extend()`; which will
+pad the bitvectors on the left with the given number of zero bits. We can also use `.sign_extend()` to pad with a duplicate of the highest bit, preserving the value of the bitvector under two's complement signed integer semantics.
+- We can create symbolic variables like this:
+```python
+claripy.BVS("x", 64)
+claripy.BVS("y", 64)
+```
+- `x` and `y` are now symbolic variables. We can do arithmetic with them, but we'll get an AST as a result.
+- Any bitvector is a **tree of operations**
+- Each AST has a `.op` and a `.args`. The op is a string naming the operation being performed, and the args are the values the operation takes as input. Unless the op is `BVV` or `BVS` (or a few others), the args are **all other ASTs**.
+The tree eventually terminates with `BVV` or `BVS`
+
+## Symbolic Constraints
+- Performing comparison operations between any two similary-typed ASTs will yield another AST: a **symbolic boolean**
+- The comparisons are unsigned by default; they can be coarced, however, to be signed
+- Never directly use a comparison between symbolic variables in the condition for an if or while statement: the answer might not have a concrete truth value.
+Use `solver.is_true` and `solver_is_false`, which test for conrete truthness/falseness without performing a constraint solve
+
+## Constraint Solving
+- We can treat any symbolic boolean as an assertion about the valid values of a symbolic variable by adding it as a **constraint to the state**.
+We can then query for a valid value of a symbolic variable by asking for an evaluation of a symbolic expression.
+```python
+state.solver.add(x > y)
+state.solver.add(y > 2)
+state.solver.add(10 > x)
+state.solver.eval(x)
+```
+- Adding these constrains to the state, we've force the constraint solver to consider them as
+assertions that must be satisfied about any values it returns.
+- If we add conflicting or contradictory constraints, such that there are no values that can be assigned
+to the variables such that the constraints are satisfiable, the state becomes **unstatisfiable** and queries against it
+will raise an exception. We can check the satisfiability of the state with `state.satisfiable()`.
+- We can evaluate more complex expressions, not only single variables.
+
+## Floating point numbers
+- z3 has support for the theory of IEEE754 floating point numbers, and so angr can use them as well.
+- The main difference is that instead of a width, a floating point number has a sort.
+- We can create floating point numbers with `FPV` and `FPS`:
+```python
+a = claripy.FPV(3.2, claripy.fp.FSORT_DOUBLE)
+```
+- Most operations with floating point numbers have an implicit third argument: the **rounding mode**. We can specify
+a rounding mode in any operation with `claripy.fp.RM_<mode>` as the first argument
+- Constraint and solving work in the same way for floating point numbers
+- We can interpret floating point as bitvectors and viceversa with `raw_to_bv` and `raw_to_fp`. These conversions preserve the bit pattern
+- To have a more accurate conversion, we can use `val_to_fp` and `val_to_bv`; these method require the size or sort of the target value as a parameter. These method can also take a `signed` parameter
+- `solver` provides several methods for common solving patterns:
+  - `solver.eval(expressions)`: gives one possible solution
+  - `solver.eval_one(expressions)`: gives the solution or throws an exception if there are more than one solution
+  - `solver.eval_upto(expressions, n)`: given `n` solutions; throws an error if fewer than `n` solutions exists
+  - `solver.eval_atleast(expressions, n)`: gives `n` solutions; throws an error if fewer than `n` are possible
+  - `solver.eval_exact(expressions, n)`: gives `n` solutions; throws an error if there aren't exactly `n` solutions
+  - `solver.min(expressions)`: gives the minimum possible solution to the given expression
+  - `solver.max(expressions)`: gives the maximum possible solution to the given expression
+
+- The methods above can take the following keyword arguments:
+  - `extra_constraints`: a tuple of constraints; they will be taken into account for this evaluation but will not be added to the state
+  - `cast_to`: casts the result to the given data type. Can only be `int` and `bytes`
 
 
