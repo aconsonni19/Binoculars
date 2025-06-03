@@ -56,4 +56,46 @@ object is loaded by a loader backend that can handle its filetype (ELF ecc...)
 ## Symbols and Relocations
 - A **symbol** maps a name to an address
 - We can get a symbol from CLE using `loader.find_symbol("<symbol_to_search>")`; wich takes either a name or an address a returns a `Symbol` object
-- 
+- The most useful atributes on a symbol are its name, its owner and its address; altough the "address" of a symbol can be ambigous. The `Symbol` object has three ways of reporting its address:
+  - .`rebased_addr`: address in the global address space
+  - `.linked_addr`: its address relative to the prelinked base of the binary. This is the address shown in `readelf(1)`
+  - `.relative_addr`: is its address relative to the object base
+- Symbols also support the notion of dynamic linking. `libc` provides the strcmp symbol, for example, as an `export`; so, if we ask CLE to give us a `strcmp` symbol from the main object directly, it'll tellus that is an `import symbol`; which do not have meaningful addresses associated with them, but they do provide a reference to the symbol that was used to resolve them through the property `.resolvedby`
+- The specific way that the links between imports and exports should be registered in memory are handled by another notion called `relocation`. Essentially, a reolcation says "**when you match an import up with an export symbol, please write the export's address to [location], formatted as [format]**"
+- We can see the full list of relocations for an object (as `Relocation` instances) as `obj.relocs`, or just a mapping from symbol to relocation with `obj.imports`
+- A relocation's corresponding import symbol can be accessed as `.symbol`. The address the relocation will write to is accessibile through any of the address identifiers you can use for `Symbol` and we can get a reference to the object requesting the relocation with `.owner`
+- If an import cannot be resolved by an export, CLE will automatically update the `externs` object (`loader.externs_obj`) to claim it provides the symbol as an export
+## Loading options
+- `Project()` creates implicitly an instance of `cle.Loader`
+- We can pass directly as arguments the options with wich we want to load the binary:
+  - `auto_load_libs`: if shared libraries (like `libc`) should be loader
+  - `except_missing_libs`: causes an exception wheneaver a binary has shared libraries that cannot be resolved
+  - `force_load_libs`: everything contained in this list will be treated as an unresolved shared library dependency
+  - `skip_libs`: prevents any library in the list from being resolved as a dependency
+  - `ld_path`: The string/s passed to this argument will be treated as additional search paths for shared libraris
+  - We can specify options that apply only to a single binary object with `main_opts` and `lib_opts`, which take dictionaries of options:
+    - `backend`: which backend to use, as either a class or a name
+    - `base_addr`: a base address to use
+    - `entry_point`: an entry point to use
+    - `arch`: the name of the architecture to use
+
+## Symbolic Functions Summaries
+- `Project` tries to replace external calls to library functions
+with symbolic summaries calld `SimProcedures`: python functions that imitate
+the library function's effect on the state.
+- Built-in `SimProcedures` are available in the `angr:SIM_PROCEDURES` dictonary wich is two-leveled, keyed first on
+the packane name (libc, posix, win32, stubs) and then on the name of the function.
+The execution of `SimProcedures` makes the analysis faster but more inaccurate.
+- When no such summary is available:
+  - If `auto_load_libs` is `True`, then the real library function is executed instead. This could cause an explosion in the number of states to be explored
+  - If `auto_load_libs` is `False` then external functions are **unresolved** and `Project` will resolve them with **generic stubs** `SimProcedures` called `ReturnUncostrained`: a unique
+  uncostrained value
+  - If `use_sim_procedures` (a parameter to `angr.Project`) is `False` then only symbols provided by the extern object will be replaced with `SimProcedures` by a stub `ReturnUncostrained`
+  - `exclude_sim_procedures_list` lets us exclude specific symbols from being replace with `SimProcedures`
+- The mechanism by which angr replaces library code with a python summary is called **hooking**
+- When performing a simulation, at every step angr check if the current address has benn hooked, and if so, runs the hook instead of the binary code of the addres.
+
+# Symbolic Expressions and Constraint Solving
+
+
+
