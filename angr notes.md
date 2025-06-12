@@ -161,4 +161,27 @@ a rounding mode in any operation with `claripy.fp.RM_<mode>` as the first argume
   - `extra_constraints`: a tuple of constraints; they will be taken into account for this evaluation but will not be added to the state
   - `cast_to`: casts the result to the given data type. Can only be `int` and `bytes`
 
+# Machine state, memory, registers
+- `state.regs` provides read and write access to the registers through attributes with the name of each register
+- `state.mem` provides typed read and write acesss to memory with index-access notation to specify the address followed by an attribute access to specify the type with wich to interpret the memory as
+- Any bitvector-typed AST can be stored in registers or memory
+
+## Basic execution
+- `state.step()` will perform one step of symbolic execution and return an objcet called `angr.engines.successors.SimSuccessors`.
+- Symbolic execution can produce several successor states that can be classified in a number of ways. The `.successors` property of this object is a list containing all the "normal" successors of a given step
+- Generation of successor states is perfomed whenever there's a branch in the execution of the program
+- angr treats the standard input as an infinite stream of symbolic data
+- We can use `state.posix.stdin.load()` to get a bitvector representing all the contend read from stdin so far
+
+## State Presets
+ - The project factory exposes seveeal state constructors:
+
+
+
+
+
+
+
+
+
 
