@@ -174,7 +174,121 @@ a rounding mode in any operation with `claripy.fp.RM_<mode>` as the first argume
 - We can use `state.posix.stdin.load()` to get a bitvector representing all the contend read from stdin so far
 
 ## State Presets
- - The project factory exposes seveeal state constructors:
+ - The project factory exposes several state constructors:
+  -  `.blank_state()`: a state with most of its data lefe uninitialized.
+  When accessing unintialized data, an unconstrained symbolic valure will be returned
+  - `.entry_state()`: a state ready to execute at the main binary's entry point
+  - `.full_init_state()`: constructs a state that is ready to execute trhough any initializers that need to run before the program's main entry point (e.g. shared library constructors, preinitializers ecc...)
+  - `.call_state(addr, arg1, arg2, ...)`: a state ready to execute a certain function
+
+ - All these constructors can take an `addr` argument that specifies from which address to start executing from
+ - `.entry_state()` and `.full_init_state()` accept an `args` argument for command line arguments and an `env` argument for enviorment variables
+ - `.entry_state()` and `.full_init_state()` can take an `argc` argument that can be set to simbolic by passing a bitvector to it
+
+## Low level interface for memory
+ - To do raw loads and writes from ranges of memroy, its better to use `state.memory` with `.load(addr, size)` and `.store(addr, val)`.
+ - The data is stored and loaded in a `big endian` fashion
+ - There is also a low-level interface for registers access, `state.registers`; which is essentially a register file with the mapping between registers and offsets defined in `archinfo`
+
+## State options
+ - Tweaks to symbolic execution with states is done trough `state.options`.
+
+## State plugins
+ - Everything stored in a SimState is actually stored in a `plugin` attached tot the state
+ - `state.globals` implenets the interface of a standard Python dict
+ - `state.history` stores historical data about a path a state has taken during execution; it is a list of single round executions
+ - Angr will track the call stack for the emulated program. On every call instruction, a frame will be added to the top of tracked callstack; whenever the stack pointer drops below the point where the topmost framwe was called, a frame is popped. `state.callstack` stores these information
+ - States also provide very vast copies to allow exploration of different possibilities. States can also be merged together
+```python
+proj = angr.Project('/bin/true')
+s = proj.factory.blank_state()
+s1 = s.copy()
+s2 = s.copy()
+
+s1.mem[0x1000].uint32_t = 0x41414141
+s2.mem[0x1000].uint32_t = 0x42424242
+
+ merge will return a tuple. the first element is the merged state
+# the second element is a symbolic variable describing a state flag
+# the third element is a boolean describing whether any merging was done
+(s_merged, m, anything_merged) = s1.merge(s2)
+
+# this is now an expression that can resolve to "AAAA" *or* "BBBB"
+aaaa_or_bbbb = s_merged.mem[0x1000].uint32_t
+```
+
+# Simulation managers
+- The most important interface in angr is the **SimulationManager**, which allows  to control symbolic execution over groups of states simultaneously; applying search strategies to explore a program's state space.
+- States are organized into **stashes**
+
+## Stepping
+- The most basic capabilityu of a simulation manager is to step forwared all states in a given stash by one basic block; this is done with `.step()`
+```python
+import angr
+proj = angr.Project('examples/fauxware/fauxware', auto_load_libs=False)
+state = proj.factory.entry_state()
+simgr = proj.factory.simgr(state)
+simgr.active
+
+[<SimState @ 0x400580>]
+
+simgr.step()
+simgr.active
+
+[<SimState @ 0x400540>]
+```
+- When a state encounters a symbolic branch condition, both of the successors states appear in the stash
+- `.run()` will continue to step untill there is nothing more to step through
+- When a state fails to produce any successors during execution, it is removed from the active stash to the `deadended` stash
+
+## Stash management
+- To move states between stashes, use `.move()`:
+```python
+simgr.move(from_stash='deadended', to_stash='authenticated', filter_func=lambda s: b'Welcome' in s.posix.dumps(1))
+simgr
+<SimulationManager with 2 authenticated, 1 deadended>
+```
+- Each stash is just a list, we can index into or iterate ove the list to access each of the individual states
+- `step` and `run` can take a `stash` argument speicifying which stash to operate on
+
+- A few stashes are used to cateogirze some special king of states:
+  - `active`: contains state that will be stepped by default, unless an alternative stash is specified
+  - `deadended`: states that cannot continue th eexecution for some reason
+  - `pruned`: When using `LAZY_SOLVES`, states are not checked for satisfiability unless absolutely necessary.
+  When a state is found to be unsatisfiable in the presence of `LAZY_SOLVES`, the state hierachy is traversed to identify when, in its history, it initially became unsat. All states that are descendants of that point are pruned an put in this stash
+  - `unconstrained`: If the save_unconstrained option is provided to the SimulationManager constructor, states that are determined to be unconstrained (i.e., with the instruction pointer controlled by user data or some other source of symbolic data) are placed here.
+  - `unsat`: If the save_unsat option is provided to the SimulationManager constructor, states that are determined to be unsatisfiable (i.e., they have constraints that are contradictory, like the input having to be both “AAAA” and “BBBB” at the same time) are placed here.
+
+## Simple Exploration
+ - The SimulationManager `.explore()` method will run until a state is found that matches the final condition, which can be he address of an instruction to stop at, a list of addresses to stop at, or a function which takes a state and returns whether it meets some criteria.
+ - Any state that matches the `find` condition will be placed in the `found` stash
+
+## Exploration techniques
+- An exploration technique is an exploration pattern of the state space of the program
+- To use an exploration techninque, we can use `sigmr.use_technique(tech)` where tech is an instance of an `ExplorationTechnique` sublcass
+- Angr builtin techniques:
+ - `DFS`: Keeps only one state active at once, putting the rest in the deferred stash until it deadends or errors
+ - `Explorer`: This technique implements the `.explore()` functionality, allowing you to search for and avoid addresses.
+ - `LengthLimiter`: Puts a cap on the maximum length of the path a state goes through
+ - `LoopSeer`: Uses a reasonable approximation of loop counting to discard states that appear to be going through a loop too many times putting them in a spinning stash and pulling them out again if we run out of otherwise viable states
+ - `ManualMergepoint`: Marks an address in the program as a merge point, so states that reach that address will be briefly held, and any other states that reach that same point within a timeout will be merged together.
+ - `MemoryWatcher`: Monitors how much memory is free/available on the system between simgr steps and stops exploration if it gets too low
+ - `Oppologist`: if this technique is enabled and angr encounters an unsupported instruction, it will concretize all the inputs to that instruction and emulate the single instruction using the unicorn engine, allowing execution to continue
+ - `Spiller`: When there are too many states active, this technique can dump some of them to disk in order to keep memory consumption low
+ - `Threading`: Adds thread-level parallelism to the stepping process
+ - `Tracer`: An exploration technique that causes execution to follow a dynamic trace recorded from some other source
+ - `Veritesting`: An implementation of a CMU paper on automatically identifying useful merge points
+
+
+
+
+
+
+
+
+
+
+
 
 
 
