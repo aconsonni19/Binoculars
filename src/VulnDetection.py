@@ -120,20 +120,34 @@ class VulnDetection:
             while len(simgr.unconstrained) == 0 and counter <= max_depth:
                 counter += 1
                 simgr.step()
-            vul_state = simgr.unconstrained
-            return  vul_state
+            vul_states = simgr.unconstrained
+            return  vul_states
         return None
+
+
+    def __is_pc_hyjackable(self, state: angr.SimState):
+        # Get the instruction pointer
+        ip = state.regs.ip
+        # Create a junk address the size of the IP
+        target_junk_addr = b"A" * (ip.size() // 8)
+
+        # Check if the program counter can point to the junk address
+        return True if state.satisfiable(extra_constraints = [state.regs.ip == target_junk_addr]) else False
+
 
     def analyze(self):
         self.__static_analysis()
-        vuln_state = self.__vulnerability_detection(2000, 1000)
+        vuln_states = self.__vulnerability_detection(2000, 1000)
 
-        return vuln_state
+        for vuln_state in vuln_states:
+            if self.__is_pc_hyjackable(vuln_state):
+                return vuln_state
+        return None
 
 
 
 
-v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/the_safe", InputMethod.STDIN)
+v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test", InputMethod.STDIN)
 
 v.analyze()
 
