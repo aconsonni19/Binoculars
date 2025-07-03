@@ -27,7 +27,7 @@ class VulnDetection:
 
         self.dangerous_functions = [
             # Input functions
-            "gets", "getchar", "getwd", "fgets", "read",
+            "gets", "getc", "getchar", "getwd", "fgets", "read",
             "scanf", "fscanf", "sscanf", "vscanf", "vfscanf", "vsscanf",
 
             # String copying functions (no bounds checking)
@@ -100,7 +100,6 @@ class VulnDetection:
 
 
     def __vulnerability_detection(self, input_len: int, max_depth: int):
-
         for program_slice in self.backward_slicing_results:
             sym_input = claripy.BVS("argv_input", input_len * 8)
 
@@ -121,8 +120,8 @@ class VulnDetection:
                 counter += 1
                 simgr.step()
             vul_states = simgr.unconstrained
-            return  vul_states
-        return None
+            return vul_states
+        return  None
 
 
     def __is_pc_hyjackable(self, state: angr.SimState):
@@ -147,7 +146,7 @@ class VulnDetection:
 
 
 
-v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test", InputMethod.STDIN)
+v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/ahgets1-bad", InputMethod.STDIN)
 
 v.analyze()
 
