@@ -6,35 +6,36 @@ import os
 import pyghidra
 import re
 
-# TODO: Ha bisogno di un serio e profondo refactoring del codice
 
 app = Flask(__name__)
 
-TEMP_UPLOAD_FOLDER = "./tmp/"
-app.config['TEMP_UPLOAD_FOLDER'] = TEMP_UPLOAD_FOLDER
-app.secret_key = os.urandom(256)
+def setup_ghidra():
+    pyghidra.start(install_dir = "../ghidra/")
+    from ghidra.app.decompiler import DecompInterface
+    from ghidra.util.task import ConsoleTaskMonitor
+    from ghidra.app.decompiler.flatapi import FlatDecompilerAPI
 
-# TODO: Move to a setup function, so that the imports can be done at the start of the program
-# Initialize jython enviorment with PyGhidra
 
-pyghidra.start(install_dir = "../ghidra/")
-from ghidra.app.decompiler import DecompInterface
-from ghidra.util.task import ConsoleTaskMonitor
-from ghidra.app.decompiler.flatapi import FlatDecompilerAPI
+BINARY_UPLOAD_FOLDER = "./binaries/"
+app.config["BINARY_UPLOAD_FOLDER"] = BINARY_UPLOAD_FOLDER
+app.secret_key = os.urandom(1024)
 
+
+
+
+# ---------------------------------------- SERVER ENDPOINTS --------------------------------------
 
 @app.route("/", methods = ["GET", "POST"])
 def main():
     if request.method == "POST":
         file = request.files.get('file')
         if valid_file(file):
-            file.seek(0) # TODO: This resets the file pointer; it is here now to test it, but it should be 
+            file.seek(0) 
             save_file(file)
             return redirect(url_for("code_analysis"))
         else:
             return render_template("index.html", error = "Invalid file format!")
     return render_template("index.html")
-
 
 @app.route("/analysis")
 def code_analysis():
@@ -43,14 +44,15 @@ def code_analysis():
     if not filepath or not os.path.exists(filepath):
         abort(404, description="File not found")
     
-    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath)))   
+    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath))) 
 
 
+
+# -------------------------------------- UTILITY FUNCTIONS ------------------------------------------
 # TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
-def valid_file(file):
+def save_file(file):
     magic_bytes = b"\x7fELF" # Magic bytes at the start of every 
     return ".elf" in file.filename or file.read(4) == magic_bytes
-
 
 def save_file(file):
     filename = secure_filename(file.filename)
@@ -62,47 +64,6 @@ def save_file(file):
 def file_cleanup(file):
     return null # TODO
 
-
-def disassemble(filepath):
-    try:
-        with open(filepath, "rb") as file:
-            elf = ELFFile(file)
-            text_section = elf.get_section_by_name('.text')  # Sezione del codice
-            if not text_section:
-                return "No .text section found in the ELF file."
-
-            # Disassembly con Capstone
-            md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
-            disassembly = []
-            for section in elf.iter_sections():
-                if not section.name or not section.data():
-                    continue
-                disassembly_section = [section.name] # Dissasembly for this section with the section name at the head
-                code = section.data()
-                addr = section['sh_addr']
-                for i in md.disasm(code, addr):
-                    # Save address, instruction and registers/memory section involved 
-                    # as a tuple so that the it can be formatted and styled indipendently:
-                    disassembly_section.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
-                disassembly.append(disassembly_section)
-            return disassembly
-    except Exception as e:
-        return str(e)
-
-def decompile(filepath):
-    try:
-        decompiled_functions = []
-        with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
-            program = flat_api.getCurrentProgram() # Get the program being analyzed
-            listing = program.getListing() # Get the program listing of the symbols
-            decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
-            for name in listing.getFunctions(True):
-                decompiled_code = decompiler.decompile(name)
-                decompiled_functions.append(decompiled_code) # Decompile the function
-        return "\n".join(decompiled_functions)  # Ensure proper spacing
-    except Exception as e:
-        return str(e)
-    
 def highlight_keywords(decompiled_code):
     keywords = {
         r"\bint\b": "keyword-int",
@@ -130,3 +91,49 @@ def highlight_keywords(decompiled_code):
             decompiled_code
         )
     return decompiled_code
+
+
+# ------------------------------------- DECOMPILING AND DISASSEMBLY ------------------------------------
+def disassemble(filepath):
+    try:
+        with open(filepath, "rb") as file:
+            elf = ELFFile(file)
+            text_section = elf.get_section_by_name('.text')  # Sezione del codice
+            if not text_section:
+                return "No .text section found in the ELF file."
+
+            # Disassembly con Capstone
+            md = Cs(CS_ARCH_X86, CS_MODE_64)  # Modifica l'architettura se necessario
+            disassembly = []
+            for section in elf.iter_sections():
+                if not section.name or not section.data():
+                    continue
+                disassembly_section = [section.name] # Dissasembly for this section with the section name at the head
+                code = section.data()
+                addr = section['sh_addr']
+                for i in md.disasm(code, addr):
+                    # Save address, instruction and registers/memory section involved 
+                    # as a tuple so that the it can be formatted and styled indipendently:
+                    disassembly_section.append((f"0x{i.address:x}", i.mnemonic, i.op_str))
+                disassembly.append(disassembly_section)
+            return disassembly
+    except Exception as e:
+        return str(e)
+
+def decompile(filepath):
+    setup_ghidra()
+    try:
+        decompiled_functions = []
+        with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
+            program = flat_api.getCurrentProgram() # Get the program being analyzed
+            listing = program.getListing() # Get the program listing of the symbols
+            decompiler = FlatDecompilerAPI(flat_api) # Get a FlatDecompilerAPI reference to the Ghidra decompiler
+            for name in listing.getFunctions(True):
+                decompiled_code = decompiler.decompile(name)
+                decompiled_functions.append(decompiled_code) # Decompile the function
+        return "\n".join(decompiled_functions)  # Ensure proper spacing
+    except Exception as e:
+        return str(e)
+
+
+ 
