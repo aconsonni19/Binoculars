@@ -6,36 +6,35 @@ import os
 import pyghidra
 import re
 
+# TODO: Ha bisogno di un serio e profondo refactoring del codice
 
 app = Flask(__name__)
 
-def setup_ghidra():
-    pyghidra.start(install_dir = "../ghidra/")
-    from ghidra.app.decompiler import DecompInterface
-    from ghidra.util.task import ConsoleTaskMonitor
-    from ghidra.app.decompiler.flatapi import FlatDecompilerAPI
+TEMP_UPLOAD_FOLDER = "./tmp/"
+app.config['TEMP_UPLOAD_FOLDER'] = TEMP_UPLOAD_FOLDER
+app.secret_key = os.urandom(256)
 
+# TODO: Move to a setup function, so that the imports can be done at the start of the program
+# Initialize jython enviorment with PyGhidra
 
-BINARY_UPLOAD_FOLDER = "./binaries/"
-app.config["BINARY_UPLOAD_FOLDER"] = BINARY_UPLOAD_FOLDER
-app.secret_key = os.urandom(1024)
+pyghidra.start(install_dir = "../ghidra/")
+from ghidra.app.decompiler import DecompInterface
+from ghidra.util.task import ConsoleTaskMonitor
+from ghidra.app.decompiler.flatapi import FlatDecompilerAPI
 
-
-
-
-# ---------------------------------------- SERVER ENDPOINTS --------------------------------------
 
 @app.route("/", methods = ["GET", "POST"])
 def main():
     if request.method == "POST":
         file = request.files.get('file')
         if valid_file(file):
-            file.seek(0) 
+            file.seek(0) # TODO: This resets the file pointer; it is here now to test it, but it should be 
             save_file(file)
             return redirect(url_for("code_analysis"))
         else:
             return render_template("index.html", error = "Invalid file format!")
     return render_template("index.html")
+
 
 @app.route("/analysis")
 def code_analysis():
@@ -44,15 +43,14 @@ def code_analysis():
     if not filepath or not os.path.exists(filepath):
         abort(404, description="File not found")
     
-    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath))) 
+    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath)))   
 
 
-
-# -------------------------------------- UTILITY FUNCTIONS ------------------------------------------
 # TODO: This function can surely be improved to avoid XSS attacks, but for now it will do
-def save_file(file):
+def valid_file(file):
     magic_bytes = b"\x7fELF" # Magic bytes at the start of every 
     return ".elf" in file.filename or file.read(4) == magic_bytes
+
 
 def save_file(file):
     filename = secure_filename(file.filename)
@@ -64,36 +62,7 @@ def save_file(file):
 def file_cleanup(file):
     return null # TODO
 
-def highlight_keywords(decompiled_code):
-    keywords = {
-        r"\bint\b": "keyword-int",
-        r"\breturn\b": "keyword-return",
-        r"\bif\b": "keyword-if",
-        r"\belse\b": "keyword-else",
-        r"\bfor\b": "keyword-for",
-        r"\bwhile\b": "keyword-while",
-        r"\bprintf\b": "keyword-function",
-        r"\bmain\b": "keyword-function",
-        r"\bvoid\b": "keyword-int",
-        r"\bchar\b": "keyword-int",
-        r"\bfloat\b": "keyword-int",
-        r"\bdouble\b": "keyword-int",
-        r"\bbyte\b": "keyword-int",
-        r"\bWARNING\b": "keyword-warning",
-        r"\bvoid\b": "keyword-void",
-        r"\bstruct\b": "keyword-struct",
-    }
 
-    for keyword, css_class in keywords.items():
-        decompiled_code = re.sub(
-            keyword,
-            rf'<span class="{css_class}">\g<0></span>',
-            decompiled_code
-        )
-    return decompiled_code
-
-
-# ------------------------------------- DECOMPILING AND DISASSEMBLY ------------------------------------
 def disassemble(filepath):
     try:
         with open(filepath, "rb") as file:
@@ -121,7 +90,6 @@ def disassemble(filepath):
         return str(e)
 
 def decompile(filepath):
-    setup_ghidra()
     try:
         decompiled_functions = []
         with pyghidra.open_program(filepath) as flat_api: # Get a FlatAPI reference to Ghidra
@@ -134,6 +102,31 @@ def decompile(filepath):
         return "\n".join(decompiled_functions)  # Ensure proper spacing
     except Exception as e:
         return str(e)
+    
+def highlight_keywords(decompiled_code):
+    keywords = {
+        r"\bint\b": "keyword-int",
+        r"\breturn\b": "keyword-return",
+        r"\bif\b": "keyword-if",
+        r"\belse\b": "keyword-else",
+        r"\bfor\b": "keyword-for",
+        r"\bwhile\b": "keyword-while",
+        r"\bprintf\b": "keyword-function",
+        r"\bmain\b": "keyword-function",
+        r"\bvoid\b": "keyword-int",
+        r"\bchar\b": "keyword-int",
+        r"\bfloat\b": "keyword-int",
+        r"\bdouble\b": "keyword-int",
+        r"\bbyte\b": "keyword-int",
+        r"\bWARNING\b": "keyword-warning",
+        r"\bvoid\b": "keyword-void",
+        r"\bstruct\b": "keyword-struct",
+    }
 
-
- 
+    for keyword, css_class in keywords.items():
+        decompiled_code = re.sub(
+            keyword,
+            rf'<span class="{css_class}">\g<0></span>',
+            decompiled_code
+        )
+    return decompiled_code
