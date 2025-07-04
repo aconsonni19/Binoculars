@@ -2,9 +2,12 @@ from flask import Flask, render_template, request, url_for, redirect, session, j
 from werkzeug.utils import secure_filename
 from elftools.elf.elffile import ELFFile
 from capstone import *
+import sys
 import os
 import pyghidra
 import re
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+from VulnDetection import VulnDetection
 
 # TODO: Ha bisogno di un serio e profondo refactoring del codice
 
@@ -42,8 +45,39 @@ def code_analysis():
     
     if not filepath or not os.path.exists(filepath):
         abort(404, description="File not found")
-    
-    return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath)))   
+
+    # return render_template("code_analysis.html", disassembly=disassemble(filepath), decompiled = highlight_keywords(decompile(filepath)))
+
+    disassembly = disassemble(filepath)
+    decompiled = highlight_keywords(decompile(filepath))
+
+    # Analisi delle vulnerabilità
+    v = VulnDetection(filepath)
+    vuln_results = v.analyze(2000, 1000, 0, [])
+
+    return render_template(
+        "code_analysis.html",
+        disassembly=disassembly,
+        decompiled=decompiled,
+        vuln_results=vuln_results
+    )
+
+@app.route("/vuln_analysis")
+def vuln_analysis():
+    filepath = session.get("FILEPATH")
+    if not filepath or not os.path.exists(filepath):
+        abort(404, description="File not found")
+
+    # Parametri di default, puoi modificarli o prenderli da query string
+    stdin_input_len = 2000
+    max_depth = 1000
+    num_of_argv_inputs = 0
+    length_of_argv_inputs = []
+
+    # Esegui l'analisi (operazione potenzialmente lunga)
+    v = VulnDetection(filepath)
+    result = v.analyze(stdin_input_len, max_depth, num_of_argv_inputs, length_of_argv_inputs)
+    return jsonify(result)
 
 
 # TODO: This function can surely be improved to avoid XSS attacks, but for now it will do

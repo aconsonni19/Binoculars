@@ -1,7 +1,6 @@
 import angr
 import claripy
 from enum import Enum
-
 from angr import SimValueError
 
 # A list of potentially dangerous functions
@@ -171,15 +170,12 @@ class VulnDetection:
             # Check if the program counter can point to the junk address
             if state.satisfiable(extra_constraints = [state.regs.ip == target_junk_addr]):
                 response[f"{addr}"] = {
-                    "Vulnearbility_found": "CWE-121: Stack-based buffer overflow",
+                    "Vulnerability_found": "CWE-121: Stack-based buffer overflow",
                     "Description": "A potential instruction pointer hijack by user input was detected",
                 }
         return response
 
 #v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test")
-v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/ahgets1-bad")
+#v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/ahgets1-bad")
 
-print(v.analyze(2000, 1000, 0, []))
-
-
-
+# print(v.analyze(2000, 1000, 0, []))
