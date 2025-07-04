@@ -66,6 +66,10 @@ document.getElementById('githubButton').addEventListener('click', function() {
     window.location.href = 'https://github.com/aconsonni19/Binoculars';
 });
 
+document.getElementById('newAnalysisButton').addEventListener('click', function() {
+    window.location.href = '/';
+});
+
 document.addEventListener("DOMContentLoaded", function() {
     const vulnContent = document.getElementById("vuln-content");
     vulnContent.innerHTML = '<div class="loader"></div><p>Analyzing vulnerabilities...</p>';
