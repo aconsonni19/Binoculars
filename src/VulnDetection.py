@@ -4,12 +4,6 @@ from enum import Enum
 
 from angr import SimValueError
 
-
-class InputMethod(Enum):
-    STDIN = 1,
-    ARGV = 2,
-    STDIN_AND_ARGV = 3
-
 # A list of potentially dangerous functions
 dangerous_functions = [
     # Input functions
