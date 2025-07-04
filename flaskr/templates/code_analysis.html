@@ -62,24 +62,7 @@
             <div class="resizer" id = "resizer-right"></div>
             <div class="right">
                 <h3>Vulnerabilities</h3>
-                {% if vuln_results %}
-                    <table>
-                        <tr>
-                            <th>Address</th>
-                            <th>Type</th>
-                            <th>Description</th>
-                        </tr>
-                        {% for addr, info in vuln_results.items() %}
-                        <tr>
-                            <td>{{ addr }}</td>
-                            <td>{{ info["Vulnerability_found"] }}</td>
-                            <td>{{ info["Description"] }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                {% else %}
-                    <p>No vulnerabilities found.</p>
-                {% endif %}
+                <div id="vuln-content"></div>
             </div>
         </div>
         

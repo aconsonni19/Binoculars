@@ -98,6 +98,20 @@ body {
     white-space: pre-wrap;
     text-align: left;
 }
+
+.loader {
+    border: 4px solid #333;
+    border-top: 4px solid #ffa420;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+@keyframes spin {
+    100% { transform: rotate(360deg); }
+}
+
 /* Stile per le righe del codice decompilato */
 .code-line {
     /*font-family: "Courier New", monospace; /* Font monospaziato per mantenere l'indentazione */

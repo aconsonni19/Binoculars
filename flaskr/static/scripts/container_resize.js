@@ -65,3 +65,35 @@ document.getElementById('aboutButton').addEventListener('click', function() {
 document.getElementById('githubButton').addEventListener('click', function() {
     window.location.href = 'https://github.com/aconsonni19/Binoculars';
 });
+
+document.addEventListener("DOMContentLoaded", function() {
+    const vulnContent = document.getElementById("vuln-content");
+    vulnContent.innerHTML = '<div class="loader"></div><p>Analyzing vulnerabilities...</p>';
+
+    fetch("/vuln_analysis")
+        .then(response => response.json())
+        .then(data => {
+            if (Object.keys(data).length === 0) {
+                vulnContent.innerHTML = "<p>No vulnerabilities found.</p>";
+            } else {
+                let table = `<table>
+                    <tr>
+                        <th>Address</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                    </tr>`;
+                for (const [addr, info] of Object.entries(data)) {
+                    table += `<tr>
+                        <td>${addr}</td>
+                        <td>${info.Vulnerability_found}</td>
+                        <td>${info.Description}</td>
+                    </tr>`;
+                }
+                table += "</table>";
+                vulnContent.innerHTML = table;
+            }
+        })
+        .catch(() => {
+            vulnContent.innerHTML = "<p style='color:red;'>Error analyzing vulnerabilities.</p>";
+        });
+});
