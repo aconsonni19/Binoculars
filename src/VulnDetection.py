@@ -126,12 +126,7 @@ class VulnDetection:
                 argv_inputs.append(claripy.BVS(f"argv_input_{i+1}", length_of_argv_inputs[i]))
 
             # Create the initial state of the binary
-            init_state = self.project.factory.entry_state(stdin = stdin_sym_input, args = argv_inputs, add_options={
-                angr.options.TRACK_REGISTER_ACTIONS,
-                angr.options.TRACK_MEMORY_ACTIONS,
-                angr.options.ZERO_FILL_UNCONSTRAINED_MEMORY,
-                angr.options.ZERO_FILL_UNCONSTRAINED_REGISTERS
-            })
+            init_state = self.project.factory.entry_state(stdin = stdin_sym_input, args = argv_inputs)
             # Get the sensitive point address
             target = program_slice["target"]
             # Create a simulation manager instance
@@ -144,12 +139,14 @@ class VulnDetection:
             if simgr.found is not None:
                 simgr.drop(stash = "active")
                 simgr.move(from_stash = "found", to_stash = "active")
-                counter = 0
-                while len(simgr.unconstrained) == 0 and counter <= max_depth:
-                    counter += 1
-                    simgr.step() # Execute one step of symbolic execution
 
-            vulnerable_states.append((simgr.unconstrained[0], target))
+            counter = 0
+            while len(simgr.unconstrained) == 0 and counter <= max_depth:
+                counter += 1
+                simgr.step() # Execute one step of symbolic execution
+
+            if len(simgr.unconstrained) > 0:
+                vulnerable_states.append((simgr.unconstrained[0], target))
         return vulnerable_states
 
 
@@ -180,7 +177,7 @@ class VulnDetection:
         return response
 
 #v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test")
-v = VulnDetection("C:/Users/39328/Desktop/eliza")
+v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/ahgets1-bad")
 
 print(v.analyze(2000, 1000, 0, []))
 
