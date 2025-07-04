@@ -174,8 +174,3 @@ class VulnDetection:
                     "Description": "A potential instruction pointer hijack by user input was detected",
                 }
         return response
-
-#v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test")
-#v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/ahgets1-bad")
-
-# print(v.analyze(2000, 1000, 0, []))
