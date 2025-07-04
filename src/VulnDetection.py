@@ -185,7 +185,8 @@ class VulnDetection:
                 }
         return response
 
-v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test")
+#v = VulnDetection("/home/spitfire/Scrivania/University/Tesi/Binoculars/flaskr/tmp/primality_test")
+v = VulnDetection("C:/Users/39328/Desktop/eliza")
 
 print(v.analyze(2000, 1000, 0, []))
 
