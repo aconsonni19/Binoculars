@@ -1,0 +1,5 @@
+{
+    "BIN_UPLOAD_FOLDER": "./binaries",
+    "GHIDRA_INSTALL_FOLDER": "./ghidra",
+    "ANGR_MAX_DEPTH": 1000
+}

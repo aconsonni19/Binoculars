@@ -1,0 +1,287 @@
+body {
+    background-color: #2c2c2c;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    direction: ltr;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* ensures logo and text align vertically */
+    padding: 10px 20px;
+    background-color: #333333;
+    border-bottom: 1px solid #444444;
+}
+
+#navbar_logo {
+    height: 32px;         /* adjust height to match link text size */
+    display: block;       /* removes any inline spacing issues */
+}
+
+#buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;  /* ensures buttons align with logo */
+}
+
+.navbar #buttons a {
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+    padding: 7px 10px;
+    font-size: 17px;
+    line-height: 1;       /* prevents link text from being too tall */
+    cursor: pointer;
+    border-radius: 10px;
+    text-decoration: none;
+}
+
+.navbar #buttons a:hover {
+    background-color: #666666;
+    color: #ffa420;
+    transition: background-color 0.3s ease;
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#main_image_div {
+    margin-top: 64px;
+    margin-bottom: 20px; /* reduce space below the image */
+}
+
+#main_image {
+    height: 256px;
+}
+
+#content p {
+    margin-top: 5px;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+#uploadButton {
+    background-color: #ffa420;
+    color: #2c2c2c;
+    border: none;
+    padding: 15px 25px;
+    font-size: 17px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+#uploadButton:hover {
+    background-color: #007fff;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.splitpanes.theme {
+    height: calc(100vh - 53px);
+    width: 100%;
+}
+
+.splitpanes.theme .splitpanes__splitter {
+    width: 3px;
+    background-color: #444857;
+    cursor: col-resize;
+    position: relative;
+    transition: background-color 0.25s ease; 
+}
+
+.splitpanes.theme .splitpanes__splitter:hover {
+    background-color: #ffa420;
+}
+
+.splitpanes.theme .splitpanes__pane {
+    text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+
+}
+
+.spinner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    transform: translateY(-10%);
+}
+
+#analysis-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: unset;
+    transform: translateY(20%);
+}
+
+table {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#disassembled_table th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+#disassembled_table .section-header {
+    position: sticky;
+    background-color: gray;
+    font-weight: bold;
+    text-align: center;
+    top: 30px;
+    z-index: 1;
+    border: 1px solid black;
+}
+
+#disassembled_table th {
+    position: sticky;
+    top: 0;
+    background-color: #333333;
+    color: #ffffff;
+    z-index: 2;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid black;
+}
+
+/*Data movement instructions */
+.mnemonic-mov, .mnemonic-push, .mnemonic-pop, .mnemonic-lea {
+    color: #ff9800;
+}
+
+/*Arithmetic & Logical operations */
+.mnemonic-add, .mnemonic-sub, .mnemonic-mul, .mnemonic-div, 
+.mnemonic-and, .mnemonic-or, .mnemonic-xor, .mnemonic-not {
+    color: #4caf50;
+}
+
+/*Control flow instructions */
+.mnemonic-jmp, .mnemonic-call, .mnemonic-ret {
+    color: #d32f2f;
+}
+
+.mnemonic-je, .mnemonic-jne, .mnemonic-jg, .mnemonic-jl,
+.mnemonic-jge, .mnemonic-jle, .mnemonic-jo, .mnemonic-jno {
+    color: #f44336;;
+}
+
+/*Comparison & test instructions */
+.mnemonic-cmp, .mnemonic-test {
+    color: #9c27b0;
+}
+
+/*Bitwise shift/rotate instructions */
+.mnemonic-shl, .mnemonic-shr, .mnemonic-sal, .mnemonic-sar, 
+.mnemonic-rol, .mnemonic-ror {
+    color: #ff5722;
+}
+
+/*Floating point operations */
+.mnemonic-fadd, .mnemonic-fsub, .mnemonic-fmul, .mnemonic-fdiv {
+    color: #00bcd4;
+}
+
+/* Special instructions */
+.mnemonic-nop, .mnemonic-hlt, .mnemonic-int {
+    color: #607d8b;
+}
+
+#decompiled_table td {
+    border: 0px;
+}
+
+#decompiled_table td.code-line {
+    text-align: left;   /* align text to left */
+    white-space: pre;   /* preserve spaces and indentation */
+    font-family: monospace; /* look like code */
+}
+
+#vuln_analysis_form label {
+    display: block;
+    margin: 8px 0 4px;
+    text-align: left;
+    padding: 0 10px;
+    font-size: 15px;
+}
+
+#vuln_analysis_form input[type="number"] {
+    width: 80%;
+    padding: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+#vuln_analysis_form form,
+#vuln_analysis_form label,
+#vuln_analysis_form input {
+    direction: ltr;
+    text-align: center;
+}
+
+#vuln_analysis_form button {
+    background-color: #ffa420;
+    color: #2c2c2c;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    margin-top: 12px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#vuln_analysis_form button:hover {
+    background-color: #007fff;
+    color: #ffffff;
+    transform: scale(1.03);
+}
+
+
+#select_analysis {
+    width: 80%;
+    padding: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #444444;
+    border-radius: 6px;
+    background-color: #2c2c2c;
+    color: #ffffff;
+    font-size: 14px;
+    appearance: none; /* Removes default OS styling */
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#select_analysis:hover {
+    background-color: #3a3a3a;
+    color: #ffa420;
+}
+
+
+/* Hide number input spinners for Chrome, Safari, Edge */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Hide number input spinners for Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}

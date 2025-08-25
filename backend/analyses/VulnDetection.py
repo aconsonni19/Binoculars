@@ -105,12 +105,11 @@ class VulnDetection:
             }
             self.backward_slicing_results.append(result)
 
-    def __vulnerability_detection(self, stdin_input_len: int, max_depth: int, num_of_argv_inputs: int, length_of_argv_inputs: list, ):
+    def __vulnerability_detection(self, stdin_input_len: int, max_depth: int, length_of_argv_inputs: list, ):
         """
         This function implements the vulnerability detection module of VulnDetect
         :param stdin_input_len The length of the symbolic input that will be passed to the binary via stdin
         :param max_depth Maximum depth of the exploration
-        :param num_of_argv_inputs The number of command line arguments to pass to the binary
         :param length_of_argv_inputs The length of the various command line arguments
         """
 
@@ -121,7 +120,7 @@ class VulnDetection:
 
             # Initialize symbolic command line arguments
             argv_inputs = [self.project.filename]
-            for i in range(num_of_argv_inputs):
+            for i in range(len(length_of_argv_inputs)):
                 argv_inputs.append(claripy.BVS(f"argv_input_{i+1}", length_of_argv_inputs[i]))
 
             # Create the initial state of the binary
@@ -149,14 +148,14 @@ class VulnDetection:
         return vulnerable_states
 
 
-    def analyze(self, stdin_input_len: int, max_depth: int, num_of_argv_inputs: int, length_of_argv_inputs: list):
+    def analyze(self, stdin_input_len: int, max_depth: int, length_of_argv_inputs: list):
         """
         This function starts the analysis and returns its results
         """
         # Execute static analysis on the binary
         self.__static_analysis()
         # Get the vulnerable states using symbolic execution
-        vulnerable_states = self.__vulnerability_detection(stdin_input_len, max_depth, num_of_argv_inputs, length_of_argv_inputs)
+        vulnerable_states = self.__vulnerability_detection(stdin_input_len, max_depth, length_of_argv_inputs)
 
         response = dict()
         for state_tuple in vulnerable_states:
