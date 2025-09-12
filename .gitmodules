@@ -1,0 +1,3 @@
+[submodule "backend/analyses/arbiter"]
+	path = backend/analyses/arbiter
+	url = https://github.com/jkrshnmenon/arbiter
