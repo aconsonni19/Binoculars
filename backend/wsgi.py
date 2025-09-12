@@ -1,14 +1,14 @@
+# TODO: Poi da mettere dietro ad un reverse proxy
 from flask import Flask, request, redirect, make_response, session, jsonify
 from werkzeug.utils import secure_filename
 from elftools.elf.elffile import ELFFile
 from elftools.common.exceptions import ELFParseError
 from capstone import *
-from threading import Thread
 import os
 import json
 import subprocess
 import sys
-from analyses.VulnDetection import VulnDetection
+from analyses.VulnDetection.VulnDetection import VulnDetection
 
 app = Flask(__name__)
 
