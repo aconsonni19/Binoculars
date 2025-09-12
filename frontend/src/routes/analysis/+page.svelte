@@ -1,5 +1,5 @@
 <script>
-    // TODO: Rivedere e refactorare bene questa parte di codice; che fa un po' schifo
+    // TODO: Rivedere e refactorare bene questa parte di codice
     import {Pane, Splitpanes} from "svelte-splitpanes";
     import { navigating  } from "$app/state";
     import { Circle, Jumper } from "svelte-loading-spinners"
