@@ -96,9 +96,3 @@ class ArbiterAnalysis:
         template.save_results(se.postprocessing(pred_level=self.CALLER_LEVEL))
 
 
-
-analysis = ArbiterAnalysis("./logs", "./jsons", BLACKLIST = [])
-
-analysis.analyze("./vuln_templates/CWE134.py", "./the_answer")
-
-
