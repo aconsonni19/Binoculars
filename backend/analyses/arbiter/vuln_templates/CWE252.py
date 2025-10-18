@@ -49,6 +49,16 @@ def specify_sources():
     _, checkpoints = parse_syscalls(SYSCALL_TABLE, return_filter=-1)
     return checkpoints
 
+def get_results(reports):
+    results_dict = {}
+    
+    for r in reports:
+        key = hex(r.bbl)
+        results_dict[key] = r.bbl_history
+        
+    return results_dict
+
+
 
 def save_results(reports):
     for r in reports:

@@ -10,7 +10,7 @@ from importlib import util
 from arbiter.master_chief import *
 
 class ArbiterAnalysis:
-    def __init__(self, LOG_DIR = None, JSON_DIR = None, CALL_DEPTH = 1, STRICT_MODE = False, IDENTIFIER = None, CALLER_LEVEL = -1, BLACKLIST = None):
+    def __init__(self, LOG_DIR = None, JSON_DIR = None, CALL_DEPTH = 1, STRICT_MODE = False, IDENTIFIER = None, CALLER_LEVEL = -1, BLACKLIST = []):
         self.LOG_DIR = LOG_DIR
         self.JSON_DIR = JSON_DIR
         self.CALL_DEPTH = CALL_DEPTH
@@ -40,7 +40,7 @@ class ArbiterAnalysis:
     def __setup(self, vd_path: str, target_path: str):
         vd = Path(vd_path)
         target = Path(target_path)
-
+        
         if not vd.exists():
             sys.stderr.write(f"Error: {vd} does not exist\n")
             raise Exception("VD does not exist")
@@ -93,6 +93,4 @@ class ArbiterAnalysis:
         se = SymExec(sb, constrain=constrain, require_dd=self.STRICT_MODE, json_dir=self.JSON_DIR)
         se.run_all()
 
-        template.save_results(se.postprocessing(pred_level=self.CALLER_LEVEL))
-
-
+        return template.get_results(se.postprocessing(pred_level=self.CALLER_LEVEL))

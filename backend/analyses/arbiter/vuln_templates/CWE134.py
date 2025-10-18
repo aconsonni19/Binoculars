@@ -27,6 +27,16 @@ def specify_sinks():
 def specify_sources():
     return {}
 
+def get_results(reports):
+    results_dict = {}
+    
+    for r in reports:
+        key = hex(r.bbl)
+        results_dict[key] = r.bbl_history
+        
+    return results_dict
+
+
 
 def save_results(reports):
     for r in reports:

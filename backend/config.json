@@ -1,5 +1,10 @@
 {
     "BIN_UPLOAD_FOLDER": "./binaries",
     "GHIDRA_INSTALL_FOLDER": "./ghidra",
-    "ANGR_MAX_DEPTH": 1000
+    "ANGR_MAX_DEPTH": 1000,
+    "ARBITER_JSON_RESULTS_FOLDER": "./analyses/arbiter/arbiter_results/jsons",
+    "ARBITER_LOGS_FOLDER": "./analyses/arbiter/arbiter_results/logs",
+    "ARBITER_CWE_VD_REGEX": "^CWE\\d+.*\\.py$",
+    "ARBITER_FUNCTIONS_BLACKLIST": [],
+    "ARBITER_VD_FOLDER": "./analyses/arbiter/vuln_templates"
 }

@@ -8,7 +8,10 @@ import os
 import json
 import subprocess
 import sys
+import re
 from analyses.VulnDetection.VulnDetection import VulnDetection
+from analyses.arbiter.ArbiterAnalysis import ArbiterAnalysis
+import uuid
 
 app = Flask(__name__)
 
@@ -107,15 +110,69 @@ def vuln_detect_analysis():
         stdin_input_len = int(request.form.get("stdin_input_length")),
         max_depth = app.config["ANGR_MAX_DEPTH"],
         length_of_argv_inputs = param_len_list
-    )
+    )    
     return jsonify(results)
 
+
+@app.route("/analyses/arbiter", methods = ["POST"])
+def arbiter_analysis():
+    # Get the filepath from the session
+    filename = session.get("FILENAME")
+    filepath = session.get("FILEPATH")
+    
+    # Get the arbiter VD directory and regex:
+    vd_dir = app.config["ARBITER_VD_FOLDER"]
+    regex = app.config["ARBITER_CWE_VD_REGEX"]
+
+    analysis = ArbiterAnalysis(
+        os.path.join(app.config["ARBITER_LOGS_FOLDER"], filename),
+        os.path.join(app.config["ARBITER_JSON_RESULTS_FOLDER"], filename),
+        BLACKLIST = app.config["ARBITER_FUNCTIONS_BLACKLIST"]
+    )
+    vds = find_vd_files(vd_dir, regex)
+
+    print(f"Found VDs: {vds}")
+        
+    results = {}
+    
+    for vd in vds:
+        try:
+            print(f"Analyzing for {vd}")
+            analysis.analyze(os.path.join(vd_dir, vd), filepath)
+            results[vd.replace(".py", "")] = True
+        except Exception:
+            print(f"This file does not present vulnerability {vd}")
+            results[vd.replace(".py", "")] = False  
+    return results
+    
+    
+    
+def find_vd_files(directory, regex):
+    matched_files = []
+    try:
+        regex = re.compile(regex)
+        for root, dirs, files in os.walk(directory):
+            for filename in files:
+                if regex.match(filename):
+                    matched_files.append(filename)
+    except Exception as e:
+        print(e)
+    finally:
+        return matched_files
+    
+    
+
+
 def save_file(file):
-    filename = secure_filename(file.filename)
-    os.makedirs(app.config['BIN_UPLOAD_FOLDER'], exist_ok=True)
+    filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
+    os.makedirs(app.config['BIN_UPLOAD_FOLDER'], exist_ok=True) # TODO: Magari farlo in avvio del server
     filepath = os.path.join(app.config["BIN_UPLOAD_FOLDER"], filename)
     session["FILEPATH"] = filepath
+    session["FILENAME"] = filename
     file.save(filepath)
+    
+    
+
     
     
 
